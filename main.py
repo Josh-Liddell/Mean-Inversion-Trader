@@ -3,13 +3,15 @@ import os
 
 folderpath = '/Users/joshua/Desktop/HW4-Trading/Data'
 bestprofit = 0 
+mark = 1
 
 
 for filename in os.listdir(folderpath):
     if filename.endswith('.csv'):
         filepath = os.path.join(folderpath, filename)  
         data = pd.read_csv(filepath)  
-        
+        data = data.sort_values(by='Date', ascending=True, inplace=False)
+
         prices = data[['Close/Last']].rename(columns={'Close/Last': 'Price'})
         prices['Price'] = prices['Price'].replace('[\$,]', '', regex=True).astype(float)
         prices['5dayAvg'] = prices['Price'].rolling(window=5).mean()
@@ -34,7 +36,7 @@ for filename in os.listdir(folderpath):
                 buyprice = price
                 isbought = True
             
-            elif price < (avg*buyThreshold) and isbought == False:
+            elif isbought == False and price < (avg*buyThreshold):
                 # print(f"Buying at: {price}")
                 buyprice = price
                 isbought = True
@@ -55,10 +57,10 @@ for filename in os.listdir(folderpath):
         print(f'First buy: {firstBuy}')
         print(f'Percent return: {round((totalprofit/firstBuy)*100,2)}'+'%')
 
-        if totalprofit > bestprofit:
+        if totalprofit > bestprofit or mark == 1:
             bestprofit = round(totalprofit,2)
             fmessage = f"\nBest total profit was ${bestprofit} from {filename[:-4]}"
-
-
+        
+        mark += 1
 
 print(fmessage)
