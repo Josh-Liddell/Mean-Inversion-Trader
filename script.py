@@ -86,6 +86,7 @@ def simpleMovingAverageStrategy(prices):
 
 
 dataDict = {}
+numStocks = 0
 
 for filename in os.listdir(folderpath):
     if filename.endswith('.csv'):
@@ -97,7 +98,6 @@ for filename in os.listdir(folderpath):
         prices['Price'] = prices['Price'].replace('[\$,]', '', regex=True).astype(float)
         prices['5dayAvg'] = prices['Price'].rolling(window=5).mean()
 
-
         totalprofit, preturn = simpleMovingAverageStrategy(prices)
         mtotalprofit, mpreturn = meanReversionStrategy(prices)
 
@@ -107,8 +107,10 @@ for filename in os.listdir(folderpath):
         dataDict[ticker+'_sma_returns'] = preturn
         dataDict[ticker+'_mr_profit'] = mtotalprofit
         dataDict[ticker+'_mr_returns'] = mpreturn
+        numStocks += 1
 
 
 json.dump(dataDict, open("tradeData.json", "w"), indent=4)
 
 print("Process Complete")
+print(f"{numStocks} stocks analyzed")
